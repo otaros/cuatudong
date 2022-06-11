@@ -1,11 +1,14 @@
+//ver 1
+
 #include <Arduino.h>
 #include <Arduino_FreeRTOS.h>
 
 #define sensor1 2
 #define sensor2 3
 #define proximity  4
-#define IN1	7
-#define IN2	6
+#define IN1	6
+#define IN2	7
+#define ENA 8
 #define MAX_SPEED 255 
 #define MIN_SPEED 0
 #define Time_To_Open 3000 //ms
@@ -31,6 +34,7 @@ void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
   pinMode(IN1, OUTPUT);
   pinMode(IN2, OUTPUT);
+  pinMode(ENA, OUTPUT);
 
   xTaskCreate(door_state_checking, "door_state_checking", configMINIMAL_STACK_SIZE, NULL, 1, NULL);
   xTaskCreate(door_control, "door_control", configMINIMAL_STACK_SIZE, NULL, 1, NULL);
@@ -92,12 +96,14 @@ void stop(){
 
 void open_door(int speed) {
   speed = constrain(speed, MIN_SPEED, MAX_SPEED);
-  digitalWrite(IN1, HIGH);// chân này không có PWM
-	analogWrite(IN2, 255 - speed);
+  digitalWrite(IN1, HIGH);
+	digitalWrite(IN2, LOW);
+  analogWrite(ENA, speed);
 }
 
 void close_door(int speed) {
   speed = constrain(speed, MIN_SPEED, MAX_SPEED);
-  digitalWrite(IN1, LOW);// chân này không có PWM
-	analogWrite(IN2, speed);
+  digitalWrite(IN1, LOW);
+	digitalWrite(IN2, HIGH);
+  analogWrite(ENA, speed);
 }
