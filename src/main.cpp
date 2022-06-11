@@ -12,7 +12,7 @@
 #define MAX_SPEED 255 
 #define MIN_SPEED 0
 #define Time_To_Open 3000 //ms
-#define Waiting_Time 5000 //ms
+#define Waiting_Time 3000 //ms
 #define SPEED 255
 
 void door_state_checking(void* pvParameters);
@@ -40,7 +40,7 @@ void setup() {
   xTaskCreate(door_control, "door_control", configMINIMAL_STACK_SIZE, NULL, 1, NULL);
   xTaskCreate(detecting, "detecting", configMINIMAL_STACK_SIZE, NULL, 1, NULL);
 
-  
+  Serial.begin(9600);
 }
 
 void loop() {}
@@ -60,7 +60,7 @@ void detecting(void* pvParameters) {
   (void) pvParameters;
   
   while(1) {
-    while(digitalRead(sensor1) == LOW || digitalRead(sensor2) == LOW) {
+    while(digitalRead(sensor1) == LOW) {
       detected = true;
     }
       detected = false;
@@ -71,20 +71,33 @@ void door_control(void* pvParameters) {
   (void) pvParameters;
 
   while(1) {
+begincycle:    
     stop();
+    while(!detected);
     if(detected){
       open_door(SPEED);
+      Serial.println("Door is opening");
       vTaskDelay(Time_To_Open / portTICK_PERIOD_MS);
       stop();
+      Serial.println("Door is opened");
     }
     while(detected){};
-    while(!detected){
+    if(!detected){
       if(!closed){
         vTaskDelay(Waiting_Time / portTICK_PERIOD_MS);
         close_door(SPEED);
-        while(!closed){};
+        Serial.println("Door is closing");
+        while(!closed){
+            if(detected){
+              Serial.println("Something is detected");
+              goto begincycle;
+        }};
         stop();
-      }else stop();
+        Serial.println("Door is closed");
+      }else {
+        stop();
+        continue;
+        }
     }
   }
 }
