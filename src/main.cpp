@@ -5,7 +5,7 @@
 
 #define sensor1 2
 #define sensor2 3
-#define proximity  4
+#define proximity 4
 #define IN1	6
 #define IN2	7
 #define ENA 8
@@ -13,7 +13,7 @@
 #define MIN_SPEED 0
 #define Time_To_Open 3000 //ms
 #define Waiting_Time 5000 //ms
-#define SPEED 50
+#define SPEED 255
 
 void door_state_checking(void* pvParameters);
 void door_control(void* pvParameters);
