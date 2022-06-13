@@ -49,7 +49,7 @@ void door_state_checking(void* pvParameters) {
   (void) pvParameters;
   
   while(1) {
-    while(digitalRead(proximity) == LOW || digitalRead(sensor2) == LOW) {
+    while(digitalRead(proximity) == LOW) {
       closed = true;
     }
       closed = false;
@@ -60,7 +60,7 @@ void detecting(void* pvParameters) {
   (void) pvParameters;
   
   while(1) {
-    while(digitalRead(sensor1) == LOW) {
+    while(digitalRead(sensor1) == LOW || digitalRead(sensor2) == LOW) {
       detected = true;
     }
       detected = false;
