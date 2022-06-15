@@ -5,13 +5,13 @@
 
 #define sensor1               2
 #define sensor2               3
-#define proximity             4
+#define proximity1            4
+#define proximity2            5
 #define IN1	                  6
 #define IN2	                  7
 #define ENA                   8
 #define MAX_SPEED             255 
 #define MIN_SPEED             0
-#define Time_To_Open          3000 //ms
 #define Waiting_Time          3000 //ms
 #define SPEED                 255
 
@@ -24,11 +24,12 @@ void stop();
 
 volatile bool closed = false;
 volatile bool detected = false;
+volatile bool opened = false;
 
 void setup() {
-  pinMode(proximity, INPUT);  
-  pinMode(5, OUTPUT);         // Enable pin for sensor 1-2
-  digitalWrite(5, HIGH);
+  pinMode(proximity1, INPUT);  
+  pinMode(proximity2, INPUT);
+  pinMode(9, OUTPUT);         // Enable pin for sensor 1-2
   pinMode(sensor1, INPUT);    
   pinMode(sensor2, INPUT);
   pinMode(LED_BUILTIN, OUTPUT);
@@ -49,10 +50,14 @@ void door_state_checking(void* pvParameters) {
   (void) pvParameters;
   
   while(1) {
-    while(digitalRead(proximity) == LOW) {
+    while(digitalRead(proximity1) == LOW) {
       closed = true;
     }
       closed = false;
+    while(digitalRead(proximity2) == LOW) {
+      opened = true;
+    }
+      opened = false;
   }
 }
 
@@ -77,7 +82,7 @@ begincycle:
     if(detected){
       open_door(SPEED);
       Serial.println("Door is opening");
-      vTaskDelay(Time_To_Open / portTICK_PERIOD_MS);
+      while(!opened);
       stop();
       Serial.println("Door is opened");
     }
